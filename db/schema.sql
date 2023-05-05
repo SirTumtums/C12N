@@ -12,7 +12,7 @@ CREATE TABLE department (
 );
 
 -- Create the "role" table with an auto-increment "id" column, a "title" column, a "salary" column, and a foreign key "department_id"
-CREATE TABLE role (
+CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE employee (
     role_id INT,
     manager_id INT,
     FOREIGN KEY (role_id)
-    REFERENCES role(id),
+    REFERENCES roles(id),
     FOREIGN KEY (manager_id)
     REFERENCES employee(id)
     ON DELETE SET NULL

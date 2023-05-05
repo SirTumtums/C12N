@@ -7,6 +7,7 @@ require('dotenv').config()
 const db = mysql.createConnection(
     {
         host: 'localhost',
+        port: 3306,
         user: 'root',
         password: process.env.PASSWORD,
         database: 'company_db'
@@ -20,7 +21,7 @@ function startApp() {
     console.log(
         logo({
             name: 'Employee Database',
-            logoColor: 'bold-magenta',
+            logoColor: 'bold-green',
         }).render())
 
     menu()
@@ -38,9 +39,9 @@ function menu() {
                     'View all roles',
                     'View all employees',
                     'Add a department',
-                    'Add a role',
+                    'Add a roles',
                     'Add an employee',
-                    'Update an employee role',
+                    'Update an employee roles',
                     'Quit'
                 ]
             }
@@ -64,7 +65,7 @@ function menu() {
                     addDepartment()
                     break;
 
-                case 'Add a role':
+                case 'Add a roles':
                     addRole()
                     break;
 
@@ -72,7 +73,7 @@ function menu() {
                     addEmployee()
                     break;
 
-                case 'Update an employee role':
+                case 'Update an employee roles':
                     updateEmployee()
                     break;
 
@@ -111,7 +112,7 @@ function addDepartment() {
 
 function viewRoles() {
 
-    db.query('SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department ON role.department_id = department.id;', (error, data) => {
+    db.query('SELECT roles.id, roles.title, department.name AS department, roles.salary FROM roles LEFT JOIN department ON roles.department_id = department.id;', (error, data) => {
         console.table(data)
         menu()
     })
@@ -126,27 +127,27 @@ function addRole() {
                    {
                 type: 'input',
                     name: 'title',
-                    message: "What is the name of the role?",
+                    message: "What is the name of the roles?",
                    },
 
                     {
                 type: 'input',
                     name: 'salary',
-                    message: "What is the salary of the role?",
+                    message: "What is the salary of the roles?",
                     },
 
                     {
                 type: 'list',
                     name: 'department',
-                    message: "What department will this role be added to?",
+                    message: "What department will this roles be added to?",
                     choices: deptChoices
                     }]
                     )
 
                 .then(res => {
                     
-                    db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [res.title, res.salary, res.department], (error, data) => {
-                        console.log('Role successfully added!')
+                    db.query('INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)', [res.title, res.salary, res.department], (error, data) => {
+                        console.log('roles successfully added!')
                         menu()
         })
     })
@@ -155,7 +156,7 @@ function addRole() {
 
 
 function viewEmployees() {
-    db.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id;", (error, data) => {
+    db.query("SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name AS department, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN roles ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id;", (error, data) => {
         console.table(data)
         menu()
     })
@@ -181,7 +182,7 @@ function addEmployee() {
             const firstName = res.first_name
             const LastName = res.last_name
          
-            db.promise().query('SELECT * FROM role')
+            db.promise().query('SELECT * FROM roles')
                 .then(([data]) => {                  
                     const roleChoices = data.map(({ id, title }) => ({
                         name: title,
@@ -193,13 +194,13 @@ function addEmployee() {
                 .prompt([
                     {
                     type: 'list',
-                        name: 'role',
-                        message: "What role will be filled by the new employee?",
+                        name: 'roles',
+                        message: "What roles will be filled by the new employee?",
                         choices: roleChoices
                     }
                 ])
                 .then(res => {
-                    const role = res.role                   
+                    const roles = res.roles                   
             
             db.promise().query('SELECT * FROM employee WHERE manager_id IS NULL')
                 .then(([data]) => {                               
@@ -214,13 +215,13 @@ function addEmployee() {
                     {
                     type: 'list',
                         name: 'manager',
-                        message: "What manager will this role be reporting to?",
+                        message: "What manager will this roles be reporting to?",
                         choices: managerChoices
                     }
                 ])
                
                 .then(res => {                                          
-            db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, LastName, role, res.manager], (error, data) => {
+            db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, LastName, roles, res.manager], (error, data) => {
                     console.log('Employee successfully added!')
                     menu()
                     })
@@ -253,7 +254,7 @@ function updateEmployee() {
                 .then(res => {
            const employee = res.employee
          
-                    db.promise().query('SELECT * FROM role')
+                    db.promise().query('SELECT * FROM roles')
                         .then(([data]) => {
 
             const roleChoices = data.map(({ id, title }) => ({
@@ -263,13 +264,13 @@ function updateEmployee() {
             inquirer
                  .prompt([
                     {
-                    name: 'role',
-                    message: 'Which new role would you like to assign to this employee?',
+                    name: 'roles',
+                    message: 'Which new roles would you like to assign to this employee?',
                     type: 'list',
                     choices: roleChoices
                     }
                   ]).then(res => {
-                    const role = res.role
+                    const roles = res.roles
                   
                     db.promise().query('SELECT * FROM employee WHERE manager_id IS NULL')
                         .then(([data]) => {
@@ -289,7 +290,7 @@ function updateEmployee() {
                     }
                     ]).then(res => {
                                                  
-                    db.query('UPDATE employee (employee, role_id, manager_id) values (?, ?, ?)', [employee, role, res.manager], function (err, data) {
+                    db.query('UPDATE employee (employee, role_id, manager_id) values (?, ?, ?)', [employee, roles, res.manager], function (err, data) {
                         console.log('Employee update successful!')
                             menu()
                         })

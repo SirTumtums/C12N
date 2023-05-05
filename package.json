@@ -1,0 +1,28 @@
+{
+  "name": "employee-database",
+  "version": "1.0.0",
+  "description": "Challenge 12 Rebbot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://https://github.com/SirTumtums/C12N.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://https://github.com/SirTumtums/C12N/issues"
+  },
+  "homepage": "https://https://github.com/SirTumtums/C12N#readme",
+  "dependencies": {
+    "asciiart-logo": "^0.2.7",
+    "console.table": "^0.10.0",
+    "dotenv": "^16.0.3",
+    "inquirer": "8.2.4",
+    "mysql2": "^3.2.0"
+  }
+}
